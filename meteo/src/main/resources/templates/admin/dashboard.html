@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理者ダッシュボード - Meteo</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>管理者ダッシュボード</h1>
+            <div class="user-info">
+                <span>ようこそ、<span th:text="${user.name}">管理者</span>さん</span>
+                <span class="role-badge admin">管理者</span>
+                <a th:href="@{/logout}">ログアウト</a>
+            </div>
+        </header>
+
+        <main>
+            <div class="dashboard-grid">
+                <!-- 管理者専用メニュー -->
+                <div class="card">
+                    <h2>申請管理</h2>
+                    <ul>
+                        <li><a href="/admin/applications">申請一覧表示</a></li>
+                        <li><a href="/admin/approval">申請承認・却下処理</a></li>
+                        <li><a href="/admin/notifications">申請書通知管理</a></li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h2>ユーザー管理</h2>
+                    <ul>
+                        <li><a href="/admin/employees">社員一覧</a></li>
+                        <li><a href="/admin/departments">部署管理</a></li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h2>システム管理</h2>
+                    <ul>
+                        <li><a href="/admin/settings">システム設定</a></li>
+                        <li><a href="/admin/templates">申請書テンプレート管理</a></li>
+                    </ul>
+                </div>
+
+                <!-- 共通機能（管理者も使用可能） -->
+                <div class="card">
+                    <h2>個人申請</h2>
+                    <ul>
+                        <li><a href="/employee/travel-expense">交通費申請</a></li>
+                        <li><a href="/employee/paid-leave">有給申請</a></li>
+                        <li><a href="/employee/my-applications">自分の申請一覧</a></li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Spring Securityの認可確認 -->
+    <div sec:authorize="hasRole('ADMIN')" style="position: fixed; bottom: 10px; right: 10px; background: #28a745; color: white; padding: 5px; border-radius: 3px; font-size: 12px;">
+        管理者権限で認証済み
+    </div>
+</body>
+</html> 
