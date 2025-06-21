@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>交通費申請 - Meteo</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <div class="header">
+            <div class="header-content">
+                <h1>🚊 交通費申請書</h1>
+                <div class="user-info">
+                    <span>申請者：<strong th:text="${user.name}">従業員</strong>さん</span>
+                    <span class="role-badge employee">従業員</span>
+                    <a class="logout-btn" th:href="@{/logout}">ログアウト</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ナビゲーション -->
+        <div class="card" style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <a href="/employee/applications" class="btn btn-secondary">← 申請一覧に戻る</a>
+                </div>
+                <div>
+                    <span style="color: #dc3545;">* 必須項目は必ず入力してください</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 申請フォーム -->
+        <div class="form-container">
+            <form th:action="@{/employee/travel-expense}" method="post" th:object="${travelExpense}">
+                
+                <!-- 基本情報 -->
+                <h2 style="border-bottom: 2px solid #f8f9fa; padding-bottom: 10px; margin-bottom: 25px;">📋 基本情報</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="title">申請タイトル <span style="color: #dc3545;">*</span></label>
+                        <input type="text" id="title" name="title" class="form-control" 
+                               placeholder="例：東京出張交通費" required th:field="*{title}">
+                        <small style="color: #6c757d;">申請内容がわかりやすいタイトルを入力してください</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="totalAmount">合計金額 <span style="color: #dc3545;">*</span></label>
+                        <input type="number" id="totalAmount" name="totalAmount" class="form-control" 
+                               placeholder="1500" required th:field="*{totalAmount}">
+                        <small style="color: #6c757d;">円単位で入力してください</small>
+                    </div>
+                </div>
+
+                <!-- 交通費詳細 -->
+                <h2 style="border-bottom: 2px solid #f8f9fa; padding-bottom: 10px; margin-bottom: 25px; margin-top: 40px;">🚌 交通費詳細</h2>
+                
+                <div class="form-group">
+                    <label for="content">申請内容・詳細 <span style="color: #dc3545;">*</span></label>
+                    <textarea id="content" name="content" class="form-control" rows="6" 
+                              placeholder="【出張先】東京本社&#10;【日程】2024年6月25日&#10;【交通手段】電車&#10;【出発地】大阪駅&#10;【到着地】東京駅&#10;【往復運賃】14,520円&#10;【備考】新幹線利用" 
+                              required th:field="*{content}"></textarea>
+                    <small style="color: #6c757d;">出張先、日程、交通手段、出発地、到着地、運賃等を詳細に記載してください</small>
+                </div>
+
+                <!-- 交通費明細（JavaScript動的追加機能） -->
+                <div class="card" style="background: #f8f9fa; margin: 25px 0;">
+                    <h3>📊 交通費明細</h3>
+                    <div id="expense-items">
+                        <div class="expense-item" style="display: grid; grid-template-columns: 2fr 2fr 1fr 1fr auto; gap: 15px; align-items: end; margin-bottom: 15px;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>出発地</label>
+                                <input type="text" class="form-control" placeholder="大阪駅">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>到着地</label>
+                                <input type="text" class="form-control" placeholder="東京駅">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>交通手段</label>
+                                <select class="form-control">
+                                    <option>電車</option>
+                                    <option>バス</option>
+                                    <option>タクシー</option>
+                                    <option>航空機</option>
+                                    <option>その他</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>金額</label>
+                                <input type="number" class="form-control expense-amount" placeholder="7260">
+                            </div>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeExpenseItem(this)" style="height: 42px;">削除</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addExpenseItem()">➕ 明細を追加</button>
+                    <div style="text-align: right; margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
+                        <strong>小計：<span id="total-amount">0</span>円</strong>
+                    </div>
+                </div>
+
+                <!-- 添付ファイル -->
+                <h2 style="border-bottom: 2px solid #f8f9fa; padding-bottom: 10px; margin-bottom: 25px; margin-top: 40px;">📎 添付ファイル</h2>
+                
+                <div class="form-group">
+                    <label for="receipt">領収書・チケット画像</label>
+                    <input type="file" id="receipt" name="receipt" class="form-control" accept="image/*,application/pdf" multiple>
+                    <small style="color: #6c757d;">領収書やチケットの画像を添付してください（JPG, PNG, PDF対応）</small>
+                </div>
+
+                <!-- 確認事項 -->
+                <div class="card" style="background: #e3f2fd; border: 1px solid #2196f3; margin: 25px 0;">
+                    <h3 style="color: #1976d2;">✅ 申請前の確認事項</h3>
+                    <div style="display: grid; gap: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" required>
+                            <span>交通費の内容に間違いがないことを確認しました</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" required>
+                            <span>領収書・チケット等の証憑を添付しました</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" required>
+                            <span>出張の業務目的が明確に記載されています</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 送信ボタン -->
+                <div style="text-align: center; margin-top: 40px;">
+                    <button type="submit" class="btn btn-primary" style="padding: 15px 40px; font-size: 16px;">
+                        📤 申請書を提出する
+                    </button>
+                    <a href="/employee/applications" class="btn btn-secondary" style="padding: 15px 40px; font-size: 16px; margin-left: 15px;">
+                        キャンセル
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- フラッシュメッセージ -->
+        <div th:if="${errorMessage}" class="alert alert-danger" style="margin-top: 20px; padding: 15px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 6px; color: #721c24;">
+            <span th:text="${errorMessage}">エラーメッセージ</span>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        let itemCounter = 1;
+
+        function addExpenseItem() {
+            const container = document.getElementById('expense-items');
+            const newItem = document.createElement('div');
+            newItem.className = 'expense-item';
+            newItem.style.cssText = 'display: grid; grid-template-columns: 2fr 2fr 1fr 1fr auto; gap: 15px; align-items: end; margin-bottom: 15px;';
+            newItem.innerHTML = `
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>出発地</label>
+                    <input type="text" class="form-control" placeholder="出発地を入力">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>到着地</label>
+                    <input type="text" class="form-control" placeholder="到着地を入力">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>交通手段</label>
+                    <select class="form-control">
+                        <option>電車</option>
+                        <option>バス</option>
+                        <option>タクシー</option>
+                        <option>航空機</option>
+                        <option>その他</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>金額</label>
+                    <input type="number" class="form-control expense-amount" placeholder="0" onchange="calculateTotal()">
+                </div>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeExpenseItem(this)" style="height: 42px;">削除</button>
+            `;
+            container.appendChild(newItem);
+            calculateTotal();
+        }
+
+        function removeExpenseItem(button) {
+            button.parentElement.remove();
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const amounts = document.querySelectorAll('.expense-amount');
+            let total = 0;
+            amounts.forEach(input => {
+                const value = parseInt(input.value) || 0;
+                total += value;
+            });
+            document.getElementById('total-amount').textContent = total.toLocaleString();
+            
+            // メインの合計金額フィールドも更新
+            const totalAmountField = document.getElementById('totalAmount');
+            if (totalAmountField) {
+                totalAmountField.value = total;
+            }
+        }
+
+        // 初期化時に計算
+        document.addEventListener('DOMContentLoaded', function() {
+            const amountInputs = document.querySelectorAll('.expense-amount');
+            amountInputs.forEach(input => {
+                input.addEventListener('change', calculateTotal);
+            });
+            calculateTotal();
+        });
+    </script>
+</body>
+</html> 

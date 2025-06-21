@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>申請一覧 - Meteo</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <div class="header">
+            <div class="header-content">
+                <h1>📋 私の申請一覧</h1>
+                <div class="user-info">
+                    <span>ようこそ、<strong th:text="${user.name}">従業員</strong>さん</span>
+                    <span class="role-badge employee">従業員</span>
+                    <a class="logout-btn" th:href="@{/logout}">ログアウト</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ナビゲーション -->
+        <div class="card" style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <a href="/employee/dashboard" class="btn btn-secondary">← ダッシュボード</a>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <a href="/employee/travel-expense/new" class="btn btn-primary">📝 交通費申請</a>
+                    <a href="/employee/paid-leave/new" class="btn btn-primary">🏖️ 有給申請</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- フィルターセクション -->
+        <div class="card" style="margin-bottom: 25px;">
+            <h2>🔍 表示フィルター</h2>
+            <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <a href="/employee/applications" class="btn btn-secondary">すべて</a>
+                <a href="/employee/applications/pending" class="btn" style="background: #ffc107; color: #212529;">承認待ちのみ</a>
+                <a href="/employee/applications/approved" class="btn btn-success">承認済みのみ</a>
+            </div>
+        </div>
+
+        <!-- 申請一覧テーブル -->
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>申請ID</th>
+                        <th>申請種類</th>
+                        <th>申請タイトル</th>
+                        <th>申請日</th>
+                        <th>ステータス</th>
+                        <th>金額</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(applications)}">
+                        <td colspan="7" style="text-align: center; padding: 40px;">
+                            📝 申請書がありません<br>
+                            <small style="color: #6c757d;">右上のボタンから新しい申請書を作成できます</small>
+                        </td>
+                    </tr>
+                    <tr th:each="app : ${applications}">
+                        <td>
+                            <strong th:text="${app.idDocument}">1</strong>
+                        </td>
+                        <td>
+                            <span th:text="${app.documentType?.typeName ?: '一般申請'}">交通費申請</span>
+                        </td>
+                        <td>
+                            <span th:text="${app.title ?: '申請書'}">東京出張交通費</span><br>
+                            <small style="color: #6c757d;" th:text="${#strings.abbreviate(app.content ?: '', 50)}">申請内容の概要...</small>
+                        </td>
+                        <td>
+                            <span th:text="${#temporals.format(app.createdAt, 'yyyy/MM/dd')}">2024/06/23</span><br>
+                            <small style="color: #6c757d;" th:text="${#temporals.format(app.createdAt, 'HH:mm')}">10:30</small>
+                        </td>
+                        <td>
+                            <span class="status-badge"
+                                  th:classappend="${app.status == '申請中'} ? 'status-pending' : (${app.status == '承認'} ? 'status-approved' : 'status-rejected')"
+                                  th:text="${app.status}">申請中</span>
+                        </td>
+                        <td>
+                            <span th:if="${app.totalAmount != null}">
+                                <strong th:text="${#numbers.formatInteger(app.totalAmount, 0, 'COMMA')}">1,500</strong>円
+                            </span>
+                            <span th:unless="${app.totalAmount != null}">-</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a th:href="@{/employee/applications/{id}(id=${app.idDocument})}" 
+                                   class="btn btn-primary btn-sm">詳細</a>
+                                <a th:if="${app.status == '申請中'}" 
+                                   th:href="@{/employee/applications/{id}/edit(id=${app.idDocument})}" 
+                                   class="btn btn-secondary btn-sm">編集</a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 申請統計 -->
+        <div class="dashboard-grid" style="margin-top: 30px;">
+            <div class="card">
+                <h2>📊 申請状況</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #007bff;">
+                            <span th:text="${#lists.size(applications)}">5</span>
+                        </div>
+                        <div style="color: #6c757d;">総申請数</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #ffc107;">
+                            <span th:text="${#lists.size(applications.?[status == '申請中'])}">2</span>
+                        </div>
+                        <div style="color: #6c757d;">承認待ち</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 24px; font-weight: bold; color: #28a745;">
+                            <span th:text="${#lists.size(applications.?[status == '承認'])}">3</span>
+                        </div>
+                        <div style="color: #6c757d;">承認済み</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>⚡ クイックアクション</h2>
+                <ul>
+                    <li><a href="/employee/travel-expense/new">📝 新しい交通費申請</a></li>
+                    <li><a href="/employee/paid-leave/new">🏖️ 新しい有給申請</a></li>
+                    <li><a href="/employee/applications/pending">⏳ 承認待ちを確認</a></li>
+                    <li><a href="/employee/templates">🗂️ テンプレート利用</a></li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h2>💡 ヒント</h2>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom: 10px;">✅ 申請書は詳細に記入しましょう</li>
+                    <li style="margin-bottom: 10px;">📎 領収書は必ず添付してください</li>
+                    <li style="margin-bottom: 10px;">⏰ 申請は早めに提出しましょう</li>
+                    <li>📧 承認結果は通知で確認できます</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- フラッシュメッセージ -->
+        <div th:if="${successMessage}" class="alert alert-success" style="margin-top: 20px; padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; color: #155724;">
+            <span th:text="${successMessage}">成功メッセージ</span>
+        </div>
+        
+        <div th:if="${errorMessage}" class="alert alert-danger" style="margin-top: 20px; padding: 15px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 6px; color: #721c24;">
+            <span th:text="${errorMessage}">エラーメッセージ</span>
+        </div>
+    </div>
+
+    <!-- Spring Securityの認可確認 -->
+    <div sec:authorize="hasAnyRole('ADMIN', 'EMPLOYEE')" style="position: fixed; bottom: 10px; right: 10px; background: #007bff; color: white; padding: 5px; border-radius: 3px; font-size: 12px;">
+        従業員権限で認証済み
+    </div>
+</body>
+</html> 

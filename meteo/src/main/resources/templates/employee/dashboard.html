@@ -4,18 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>従業員ダッシュボード - Meteo</title>
-    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" th:href="@{/css/common.css}">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>従業員ダッシュボード</h1>
-            <div class="user-info">
-                <span>ようこそ、<span th:text="${user.name}">従業員</span>さん</span>
-                <span class="role-badge employee">従業員</span>
-                <a th:href="@{/logout}">ログアウト</a>
+        <div class="header">
+            <div class="header-content">
+                <h1>👤 従業員ダッシュボード</h1>
+                <div class="user-info">
+                    <span>ようこそ、<strong th:text="${user.name}">従業員</strong>さん</span>
+                    <span class="role-badge employee">従業員</span>
+                    <a class="logout-btn" th:href="@{/logout}">ログアウト</a>
+                </div>
             </div>
-        </header>
+        </div>
 
         <main>
             <div class="dashboard-grid">
