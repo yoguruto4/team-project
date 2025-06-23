@@ -4,48 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ログイン - FormFlow Meteo</title>
-    <link rel="stylesheet" th:href="@{/css/login.css}">
+
+
+    <link rel="stylesheet"
+          th:href="@{/css/login.css}"
+          href="/css/login.css" />
+          <!-- Spring Boot 用-->
+
+    <!-- ローカルプレビュー用 -->
+    <!-- <link rel="stylesheet"
+          href="../static/css/login.css"> -->
+          <!-- Live Server 用 -->
+
+          <style>body{background:#f6f6f6} </style>
+          <!-- <style>body{background:#f0f0f0}</style> -->
 </head>
+
 <body>
-    <div class="login-container">
-        <!-- エラーメッセージ表示 -->
-        <div th:if="${param.error}" class="alert alert-error">
-            ログインに失敗しました。メールアドレスまたはパスワードが正しくありません。
-        </div>
-        <!-- ログアウト成功メッセージ表示 -->
-        <div th:if="${param.logout}" class="alert alert-success">
-            ログアウトしました。
-        </div>
-        <!-- ログインフォーム -->
-        <form th:action="@{/login}" method="post">
-            <div class="form-group">
-                <label for="username">Email</label>
-                <input
-                    type="email"
-                    id="username"
-                    name="username"
-                    placeholder="Value..."
-                    required
-                    autocomplete="username">
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Value..."
-                    required
-                    autocomplete="current-password">
-            </div>
-            <button type="submit" class="btn-login">ログイン</button>
-        </form>
-    </div>
-    <script th:src="@{/js/login.js}"></script>
+    <!-- 画面中央に配置するためのラッパー（flexbox） -->
+    <div class="login-wrapper">
+        <div class="login-wrapper">
+            <div class="login-card">
+                <div th:if="${param.error}" class="alert alert-error">
+                    ログインに失敗しました。メールアドレスまたはパスワードが正しくありません。
+                </div>
+
+                <div id="flashMessage" class="flash hidden"></div>
+                <div th:if="${param.logout} and ${param.error == null}" class="alert alert-success">
+                    ログアウトしました。
+                </div>
+                
+
+            <!-- ログインフォーム -->
+            <form th:action="@{/login}" method="post">
+                <div class="form-group">
+                    <label for="username">Email</label>
+                    <input type="email" name="username"
+                    placeholder="メールアドレスを入力してください"
+                    autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" name="password"
+                    placeholder="パスワードを入力してください"
+                    autocomplete="current-password" required>
+                </div>
+
+                <button type="submit" class="btn-login">ログイン</button>
+            </form>
+        </div><!-- /.login-card -->
+    </div><!-- /.login-wrapper -->
+
+    <script th:src="@{/js/login.js}" defer></script>
+    <!-- Spring Boot 用 -->
+
+    <!-- <script src="../static/js/login.js" defer></script> -->
+    <!-- Live Server 用 -->
 </body>
 </html>
-
-
-
-
-

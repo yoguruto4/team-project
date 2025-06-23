@@ -59,16 +59,7 @@
 
 ---
 
-## 8. NotificationController
-
-- GET `/notifications`
-  - ユーザー宛の通知一覧を表示
-- PUT `/notifications/{id}/read`
-  - 通知を既読に更新し、該当申請詳細画面に遷移
-
----
-
-## 9. AdminDocumentController
+## 8. AdminDocumentController
 
 - GET `/admin/documents`
   - 管理者用の申請書一覧画面を表示

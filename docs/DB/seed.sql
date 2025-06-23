@@ -15,7 +15,7 @@ INSERT INTO document_type (nm_document_type) VALUES
 ('有給申請');
 
 -- 申請書マスタ
-INSERT INTO document (id_document_typ, id_employee, id_approval, id_approved_by) VALUES
+INSERT INTO document (id_document_type, id_employee, id_approval, id_approved_by) VALUES
 (1, 1, 1, 2),
 (2, 2, 2, NULL);
 
@@ -37,9 +37,9 @@ INSERT INTO travel_expense_template (id_employee, departure_location, arrival_lo
 (1, '渋谷', '品川', '電車', '往復', '山手線', 480.00);
 
 -- 承認マスタ
-INSERT INTO approval (id_document, approval_status, date_approval_request, date_approval) VALUES
-(1, '承認', '2025-06-19 10:00:00', '2025-06-19 12:00:00'),
-(2, '未承認', '2025-06-19 11:00:00', NULL);
+INSERT INTO approval ( approval_status, date_approval_request, date_approval) VALUES
+('承認', '2025-06-19 10:00:00', '2025-06-19 12:00:00'),
+('未承認', '2025-06-19 11:00:00', NULL);
 
 
 

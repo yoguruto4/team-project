@@ -11,11 +11,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "notification")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class NotificationEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +34,11 @@ public class NotificationEntity {
     @JoinColumn(name = "id_document")
     private DocumentEntity document;
 
-    @Column(name = "type", nullable = false, length = 50)
-    private String type;
+    @Column(name = "comment", nullable = false)
+    private String comment;
+
+    // @Column(name = "type", nullable = false, length = 50)
+    // private String type;
 
     @Column(name = "message")
     private String message;

@@ -1,12 +1,18 @@
+package com.formflow.meteo.app.infra.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "paid_leave_request")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PaidLeaveRequestEntity {
 
     @Id
@@ -17,10 +23,6 @@ public class PaidLeaveRequestEntity {
     @ManyToOne
     @JoinColumn(name = "id_document", nullable = false)
     private DocumentEntity document;
-
-    @ManyToOne
-    @JoinColumn(name = "id_document_typ", nullable = false)
-    private DocumentTypeEntity documentType;
 
     @Column(name = "paid_leave_days", nullable = false, precision = 3, scale = 1)
     private BigDecimal paidLeaveDays;

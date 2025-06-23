@@ -1,79 +1,163 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* -------- ベース -------- */
+.alert[th\:if] {
+  display: none;
 }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 body {
-    background:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    height:100vh;   /* 画面中央 */
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
+  background: #f6f6f6; /* 薄いグレー背景（2枚目と同系色） */
 }
-.login-container{
-    max-width:350px;   /* カード幅 */
-    width:100%;
-    padding:2.5rem;
-    border:1px solid #E5E7EB;
-    border-radius:8px;
-    box-shadow:0 4px 12px rgba(0,0,0,.06);
-    background:#fff;
+
+/* -------- レイアウトラップ -------- */
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center; /* 縦中央 */
+  justify-content: center; /* 横中央 */
+  background: #f2f2f2;
+  padding: 1rem; /* スマホで左右に余白 */
 }
+
+/* -------- カード -------- */
+.login-card {
+  width: 100%;
+  max-width: 900px;
+  padding: 2.5rem 2.75rem;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+@media (min-width: 768px) {
+  .login-card {
+    max-width: 540px;
+  }
+}
+
+/* -------- フォーム -------- */
 .form-group {
-    margin-bottom: 20px;
+  margin-bottom: 1.75rem;
 }
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #333;
-    font-weight: normal;
+
+label {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+  display: block;
 }
-.form-group input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid #D1D5DB;
-    border-radius: 6px;
-    font-size: 16px;
-    background-color: #FFFFFF;
-    color: #333;
-    transition: border-color 0.2s;
+
+/* -------- ボタン -------- */
+.btn-login {
+  transition: background 0.2s ease;
 }
-.form-group input:focus {
-    outline: none;
-    border-color: #6B7280;
-}
-.form-group input::placeholder {
-    color: #9CA3AF;
-}
-.btn-login{
-    width:100%;
-    padding:12px 0;
-    border:none;
-    border-radius:6px;
-    background:#333;
-    color:#fff;
-    font-weight:600;
-    cursor:pointer;
-    transition:opacity .2s;
-}
-.btn-login:hover{opacity:.9;}
 .btn-login:hover {
-    background-color: #1F2937;
+  background: #1f1f1f;
 }
+.btn-login:focus-visible {
+  outline: 3px solid #85b8ff; /* キーボード操作時に見える青枠 */
+  outline-offset: 2px;
+}
+
+/* === アラート === */
 .alert {
-    padding: 12px;
-    margin-bottom: 20px;
-    border-radius: 6px;
-    font-size: 14px;
+  font-size: 0.9rem;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1.25rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
 }
 .alert-error {
-    background-color: #FEE2E2;
-    color: #DC2626;
-    border: 1px solid #FECACA;
+  background: #ffe8e8;
+  border-color: #f5bcbc;
+  color: #c12525;
 }
 .alert-success {
-    background-color: #DCFCE7;
-    color: #16A34A;
-    border: 1px solid #BBF7D0;
+  background: #eaf8ef;
+  border-color: #b7e1c4;
+  color: #2e8b57;
+}
+.alert-success[th\:if] {
+  display: none;
+}
+.alert:empty {
+  display: none;
+} /* ←追加 */
+
+/* === 入力 === */
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* フォーカス時 */
+input[type="email"]:focus,
+input[type="password"]:focus {
+  outline: none; /* 既定の黒い outline を消す */
+  border-color: #7ca9ff; /* 薄い青枠 */
+  box-shadow: 0 0 0 3px rgba(124, 169, 255, 0.25); /* ソフトに光らせる */
+}
+
+/* -------- アラート -------- */
+.alert-success {
+  background: #eaf8ef;
+  border: 1px solid #b7e1c4;
+  color: #2e8b57;
+}
+/* -------- アラート -------- */
+.alert:empty {
+  display: none;
+} /* “中身が空” のアラートを非表示 */
+.btn-login {
+  all: unset;
+} /* 競合リセット（念のため） */
+.btn-login {
+  display: block;
+  width: 100%;
+  padding: 0.7rem 0;
+  text-align: center;
+  background: #2e2e2e;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: 0.2s background;
+}
+.btn-login:hover {
+  background: #1f1f1f;
+}
+
+.flash {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  background: #16a34a; /* 好きな色に変更可 */
+  color: #fff;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+.flash.show {
+  opacity: 1;
+}
+.hidden {
+  display: none;
 }

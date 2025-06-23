@@ -1,167 +1,78 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>申請一覧 - Meteo</title>
-    <link rel="stylesheet" th:href="@{/css/common.css}">
+  <meta charset="UTF-8" />
+  <title>申請書管理</title>
+
+  <!-- 共通フォント & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" referrerpolicy="no-referrer" />
+
+  <!-- 共通ヘッダーの CSS & この画面専用 CSS -->
+  <!-- <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+  <link rel="stylesheet" th:href="@{/css/applications.css}" /> -->
+    <!-- Spring Boot 用 -->
+
+    <link rel="stylesheet" href="../../static/css/dashboard.css" />
+    <link rel="stylesheet" href="../../static/css/applications.css" />
+    <!-- Live Server 用 -->
 </head>
 <body>
-    <div class="container">
-        <!-- ヘッダー -->
-        <div class="header">
-            <div class="header-content">
-                <h1>📋 申請一覧管理</h1>
-                <div class="user-info">
-                    <span>ようこそ、<strong th:text="${user.name}">管理者</strong>さん</span>
-                    <span class="role-badge admin">管理者</span>
-                    <a class="logout-btn" th:href="@{/logout}">ログアウト</a>
-                </div>
-            </div>
-        </div>
+  <!-- ===== Header（既存スタイルを流用） ===== -->
+  <header>
+    <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
+    <div class="user">
+      <span>三浦 大雅</span> <!-- ここは動的に置換してください -->
+    </div>
+    <button class="logout-btn" id="logoutBtn">ログアウト</button>
+  </header>
 
-        <!-- ナビゲーション -->
-        <div class="card" style="margin-bottom: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <a href="/admin/dashboard" class="btn btn-secondary">← ダッシュボード</a>
-                </div>
-                <div>
-                    <span>全従業員の申請書を管理・承認できます</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- フィルターセクション -->
-        <div class="card" style="margin-bottom: 25px;">
-            <h2>🔍 フィルター</h2>
-            <form method="get" action="/admin/applications">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="status">ステータス</label>
-                        <select id="status" name="status" class="form-control">
-                            <option value="">すべて</option>
-                            <option value="申請中" th:selected="${selectedStatus == '申請中'}">申請中</option>
-                            <option value="承認" th:selected="${selectedStatus == '承認'}">承認済み</option>
-                            <option value="却下" th:selected="${selectedStatus == '却下'}">却下</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="type">申請種類</label>
-                        <select id="type" name="type" class="form-control">
-                            <option value="">すべて</option>
-                            <option value="交通費申請" th:selected="${selectedType == '交通費申請'}">交通費申請</option>
-                            <option value="有給申請" th:selected="${selectedType == '有給申請'}">有給申請</option>
-                        </select>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary">検索</button>
-                <a href="/admin/applications" class="btn btn-secondary">リセット</a>
-            </form>
-        </div>
-
-        <!-- 申請一覧テーブル -->
-        <div class="table-container">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>申請ID</th>
-                        <th>申請者</th>
-                        <th>申請種類</th>
-                        <th>申請日</th>
-                        <th>ステータス</th>
-                        <th>金額</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:if="${#lists.isEmpty(applications)}">
-                        <td colspan="7" style="text-align: center; padding: 40px;">
-                            📝 該当する申請書がありません
-                        </td>
-                    </tr>
-                    <tr th:each="app : ${applications}">
-                        <td>
-                            <strong th:text="${app.idDocument}">1</strong>
-                        </td>
-                        <td>
-                            <span th:text="${app.employee?.name ?: '不明'}">田中太郎</span><br>
-                            <small style="color: #6c757d;" th:text="${app.employee?.email ?: ''}">taro@example.com</small>
-                        </td>
-                        <td>
-                            <span th:text="${app.documentType?.typeName ?: '不明'}">交通費申請</span>
-                        </td>
-                        <td>
-                            <span th:text="${#temporals.format(app.createdAt, 'yyyy/MM/dd HH:mm')}">2024/06/23 10:30</span>
-                        </td>
-                        <td>
-                            <span class="status-badge"
-                                  th:classappend="${app.status == '申請中'} ? 'status-pending' : (${app.status == '承認'} ? 'status-approved' : 'status-rejected')"
-                                  th:text="${app.status}">申請中</span>
-                        </td>
-                        <td>
-                            <span th:if="${app.totalAmount != null}">
-                                <strong th:text="${#numbers.formatInteger(app.totalAmount, 0, 'COMMA')}">1,500</strong>円
-                            </span>
-                            <span th:unless="${app.totalAmount != null}">-</span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <a th:href="@{/admin/applications/{id}(id=${app.idDocument})}" 
-                                   class="btn btn-primary btn-sm">詳細</a>
-                                <a th:if="${app.status == '申請中'}" 
-                                   th:href="@{/admin/applications/{id}(id=${app.idDocument})}" 
-                                   class="btn btn-success btn-sm">承認</a>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- 統計情報 -->
-        <div class="dashboard-grid" style="margin-top: 30px;">
-            <div class="card">
-                <h2>📊 申請統計</h2>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div style="text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #ffc107;">
-                            <span th:text="${#lists.size(applications.?[status == '申請中'])}">3</span>
-                        </div>
-                        <div style="color: #6c757d;">承認待ち</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: #28a745;">
-                            <span th:text="${#lists.size(applications.?[status == '承認'])}">12</span>
-                        </div>
-                        <div style="color: #6c757d;">承認済み</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>⚡ クイックアクション</h2>
-                <ul>
-                    <li><a href="/admin/applications?status=申請中">承認待ち申請を確認</a></li>
-                    <li><a href="/admin/history">承認履歴を確認</a></li>
-                    <li><a href="/admin/settings">システム設定</a></li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- フラッシュメッセージ -->
-        <div th:if="${successMessage}" class="alert alert-success" style="margin-top: 20px; padding: 15px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; color: #155724;">
-            <span th:text="${successMessage}">成功メッセージ</span>
-        </div>
-        
-        <div th:if="${errorMessage}" class="alert alert-danger" style="margin-top: 20px; padding: 15px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 6px; color: #721c24;">
-            <span th:text="${errorMessage}">エラーメッセージ</span>
-        </div>
+  <!-- ===== Main ===== -->
+  <main>
+    <div class="content"></div>
+    <!-- フィルター -->
+    <div class="filter-box">
+      <label for="filterSelect">フィルター</label>
+      <select id="filterSelect">
+        <option value="all">なし</option>
+        <option value="pending">未承認</option>
+        <option value="rejected">却下</option>
+      </select>
     </div>
 
-    <!-- Spring Securityの認可確認 -->
-    <div sec:authorize="hasRole('ADMIN')" style="position: fixed; bottom: 10px; right: 10px; background: #28a745; color: white; padding: 5px; border-radius: 3px; font-size: 12px;">
-        管理者権限で認証済み
+    <!-- 申請一覧テーブル -->
+    <table id="applicationTable">
+      <thead>
+        <tr>
+          <th>申請者</th><th>ステータス</th><th>種別</th><th>提出日</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ★ モックデータ。Thymeleaf なら th:each で置換 -->
+        <tr data-status="pending">
+          <td>三浦 大雅</td>
+          <td>未承認</td><td>有給申請</td><td>yyyy/mm/dd</td>
+        </tr>
+        <tr data-status="rejected">
+          <td>三浦 大雅</td>
+          <td>却下</td><td>交通費申請</td><td>yyyy/mm/dd</td>
+        </tr>
+        <!-- …追加行 -->
+      </tbody>
+    </table>
+
+    <!-- 戻るボタン -->
+    <div class="back-wrapper">
+      <a class="back-btn" th:href="@{/admin/dashboard}">もどる</a>
     </div>
+  </main>
+
+  <!-- <script th:src="@{/js/applications.js}" defer></script> -->
+    <!-- Spring Boot 用 -->
+
+    <script src="../../static/js/application.js" defer></script>
+    <!-- Live Server 用 -->
 </body>
-</html> 
+</html>

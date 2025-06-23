@@ -1,71 +1,67 @@
 <!DOCTYPE html>
-<html lang="ja" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>従業員ダッシュボード - Meteo</title>
-    <link rel="stylesheet" th:href="@{/css/common.css}">
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <div class="header-content">
-                <h1>👤 従業員ダッシュボード</h1>
-                <div class="user-info">
-                    <span>ようこそ、<strong th:text="${user.name}">従業員</strong>さん</span>
-                    <span class="role-badge employee">従業員</span>
-                    <a class="logout-btn" th:href="@{/logout}">ログアウト</a>
-                </div>
-            </div>
-        </div>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>一般社員ダッシュボード</title>
 
-        <main>
-            <div class="dashboard-grid">
-                <!-- 従業員の主要機能 -->
-                <div class="card">
-                    <h2>申請書作成</h2>
-                    <ul>
-                        <li><a href="/employee/travel-expense/new">交通費申請書入力</a></li>
-                        <li><a href="/employee/paid-leave/new">有給申請書入力</a></li>
-                    </ul>
-                </div>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
 
-                <div class="card">
-                    <h2>申請状況確認</h2>
-                    <ul>
-                        <li><a href="/employee/applications">提出済み申請一覧</a></li>
-                        <li><a href="/employee/applications/pending">承認待ち申請</a></li>
-                        <li><a href="/employee/applications/approved">承認済み申請</a></li>
-                    </ul>
-                </div>
+    <!-- Font Awesome 6（ベルアイコン用） -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      referrerpolicy="no-referrer"
+    />
 
-                <div class="card">
-                    <h2>テンプレート機能</h2>
-                    <ul>
-                        <li><a href="/employee/templates/travel-expense">交通費申請テンプレート</a></li>
-                        <li><a href="/employee/templates/paid-leave">有給申請テンプレート</a></li>
-                    </ul>
-                </div>
+    <!-- 共通 CSS -->
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}" />
+    <!-- Spring Boot 用 -->
 
-                <div class="card">
-                    <h2>通知・お知らせ</h2>
-                    <ul>
-                        <li><a href="/employee/notifications">承認状況通知</a></li>
-                        <li><a href="/employee/notifications/history">通知履歴</a></li>
-                    </ul>
-                </div>
-            </div>
-        </main>
-    </div>
+    <!-- <link rel="stylesheet" href="../../static/css/dashboard.css" /> -->
+    <!--Live Server 用 -->
+  </head>
+  <body>
+    <!-- ===== Header ===== -->
+    <header>
+      <button class="icon-btn" id="bellBtn" aria-label="notifications">
+        <i class="fa-regular fa-bell"></i>
+      </button>
 
-    <!-- Spring Securityの認可確認 -->
-    <div sec:authorize="hasAnyRole('ADMIN', 'EMPLOYEE')" style="position: fixed; bottom: 10px; right: 10px; background: #007bff; color: white; padding: 5px; border-radius: 3px; font-size: 12px;">
-        従業員権限で認証済み
-    </div>
+      <div class="user">
+        <span id="userName">山田 花子</span>
+        <!-- サーバー側で動的出力 -->
+      </div>
 
-    <!-- 管理者の場合は追加の権限表示 -->
-    <div sec:authorize="hasRole('ADMIN')" style="position: fixed; bottom: 40px; right: 10px; background: #28a745; color: white; padding: 5px; border-radius: 3px; font-size: 12px;">
-        管理者権限も保有
-    </div>
-</body>
-</html> 
+      <form id="logoutForm" th:action="@{/logout}" method="post">
+        <button class="logout-btn" id="logoutBtn">ログアウト</button>
+      </form>
+    </header>
+
+    <!-- ===== Main ===== -->
+    <main>
+      <div class="button-group">
+        <a href="#" class="main-card" id="createDocBtn">申請書作成</a>
+        <a href="#" class="main-card" id="completedListBtn">申請済みリスト</a>
+      </div>
+    </main>
+
+    <!-- カスタム JS -->
+    <script th:src="@{/js/dashboard.js}" defer></script>
+    <!-- Spring Boot 用 -->
+    <!-- <script src="../../static/js/dashboard.js" defer></script> -->
+    <!-- Live Server 用 -->
+
+    <!-- 社員用 JS（最小のクリックハンドラを定義） -->
+    <script th:src="@{/js/employee.js}" defer></script>
+    <!-- Spring Boot 用 -->
+
+    <!-- <script src="../../static/js/employee.js" defer></script> -->
+    <!-- Live Server 用 -->
+  </body>
+</html>

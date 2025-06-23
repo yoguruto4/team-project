@@ -1,13 +1,17 @@
--- 既存のテーブルを削除
+-- 1. document を参照しているテーブルを先に削除
 DROP TABLE IF EXISTS notification;
+DROP TABLE IF EXISTS approval;
 DROP TABLE IF EXISTS paid_leave_request;
 DROP TABLE IF EXISTS travel_expense;
+
+-- 2. document を削除
 DROP TABLE IF EXISTS document;
+
+-- 3. document_type や employee など、他の依存が少ないテーブル
 DROP TABLE IF EXISTS document_type;
+DROP TABLE IF EXISTS travel_expense_template;
 DROP TABLE IF EXISTS employee;
 DROP TABLE IF EXISTS department;
-DROP TABLE IF EXISTS travel_expense_template;
-DROP TABLE IF EXISTS approval;
 
 -- 部署マスタ
 CREATE TABLE department (
@@ -39,12 +43,12 @@ CREATE TABLE document_type (
 -- 申請書マスタ
 CREATE TABLE document (
     id_document INT AUTO_INCREMENT PRIMARY KEY,
-    id_document_typ INT NOT NULL,
+    id_document_type INT NOT NULL,
     id_employee INT NOT NULL,
     id_approval INT NOT NULL,
     date_submission DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     id_approved_by INT,
-    FOREIGN KEY (id_document_typ) REFERENCES document_type(id_document_type),
+    FOREIGN KEY (id_document_type) REFERENCES document_type(id_document_type),
     FOREIGN KEY (id_employee) REFERENCES employee(id_employee)
 );
 
@@ -94,11 +98,9 @@ CREATE TABLE travel_expense_template (
 -- 承認マスタ
 CREATE TABLE approval (
     id_approval INT AUTO_INCREMENT PRIMARY KEY,
-    id_document INT NOT NULL,
     approval_status ENUM('承認', '未承認', '却下') NOT NULL,
     date_approval_request DATETIME NOT NULL,
-    date_approval DATETIME,
-    FOREIGN KEY (id_document) REFERENCES document(id_document)
+    date_approval DATETIME
 );
 
 -- 通知マスタ
